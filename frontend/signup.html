@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up – TripSync</title>
+    <meta name="description" content="Join TripSync – the community for solo travelers seeking adventure and connection.">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-bg-orb auth-bg-orb-1"></div>
+        <div class="auth-bg-orb auth-bg-orb-2"></div>
+
+        <div class="glass-card" style="max-width: 520px;">
+            <div class="brand-logo">
+                <div class="logo-icon">✈️</div>
+                <span>TripSync</span>
+            </div>
+            <div class="auth-title">Join the adventure</div>
+            <div class="auth-subtitle">Create your account and start exploring</div>
+
+            <form id="signup-form">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-user input-icon"></i>
+                        <input type="text" id="name" required placeholder="Jane Smith">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-envelope input-icon"></i>
+                        <input type="email" id="email" required placeholder="you@example.com">
+                    </div>
+                </div>
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-lock input-icon"></i>
+                            <input type="password" id="password" required placeholder="Min 6 characters" minlength="6">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="city">Your City</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-city input-icon"></i>
+                            <input type="text" id="city" required placeholder="New York">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="bio">Bio <span style="color:var(--text-dim);font-weight:400;">(optional)</span></label>
+                    <textarea id="bio" rows="2" placeholder="Tell travelers a bit about yourself..."></textarea>
+                </div>
+                <div id="error" class="error-msg"></div>
+                <button type="submit" id="submit-btn" style="margin-top:0.25rem;">
+                    <i class="fa-solid fa-user-plus"></i> Create Account
+                </button>
+            </form>
+
+            <div class="footer-link">
+                Already a member? <a href="login.html">Sign in</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="api.js"></script>
+    <script>
+        if (getUserId()) window.location.href = 'home.html';
+
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = '';
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating account...';
+
+            const data = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                city: document.getElementById('city').value,
+                bio: document.getElementById('bio').value
+            };
+
+            try {
+                await apiCall('/users/signup', 'POST', data);
+                showToast('Account created! Please sign in. 🎉');
+                setTimeout(() => window.location.href = 'login.html', 1500);
+            } catch (err) {
+                errorDiv.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${err.message}`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Create Account';
+            }
+        });
+    </script>
+</body>
+</html>

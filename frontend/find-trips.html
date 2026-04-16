@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Trips – TripSync</title>
+    <meta name="description" content="Browse and join solo travel adventures on TripSync.">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Mobile Nav -->
+    <div id="mobile-nav-overlay"></div>
+    <div id="mobile-nav-drawer">
+        <div class="mobile-nav-header">
+            <a href="home.html" class="logo" onclick="closeMobileNav()">
+                <div class="logo-icon-nav">✈️</div>
+                <span class="logo-text">TripSync</span>
+            </a>
+            <button class="mobile-nav-close" onclick="closeMobileNav()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="mobile-nav-links">
+            <a href="home.html" onclick="closeMobileNav()"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="find-trips.html" class="active" onclick="closeMobileNav()"><i class="fa-solid fa-compass"></i> Explore</a>
+            <a href="my-trips.html" onclick="closeMobileNav()"><i class="fa-solid fa-suitcase"></i> My Trips</a>
+            <a href="wishlist.html" onclick="closeMobileNav()"><i class="fa-solid fa-heart"></i> Wishlist</a>
+            <a href="profile.html" onclick="closeMobileNav()"><i class="fa-solid fa-user"></i> Profile</a>
+            <a href="create-trip.html" class="btn-cta-mobile" onclick="closeMobileNav()"><i class="fa-solid fa-plus"></i> Host a Trip</a>
+            <a href="#" onclick="logout()" style="color:#f87171;margin-top:0.5rem;"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
+        </div>
+    </div>
+
+    <nav class="navbar" id="navbar">
+        <a href="home.html" class="logo">
+            <div class="logo-icon-nav">✈️</div>
+            <span class="logo-text">TripSync</span>
+        </a>
+        <div class="nav-links">
+            <a href="home.html">Home</a>
+            <a href="find-trips.html" class="active">Explore</a>
+            <a href="my-trips.html">My Trips</a>
+            <a href="wishlist.html"><i class="fa-regular fa-heart"></i></a>
+            <a href="create-trip.html" class="btn-primary"><i class="fa-solid fa-plus"></i> Host Trip</a>
+            <a href="profile.html" class="nav-profile-btn" title="My Profile">U</a>
+            <button class="btn-ghost" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+        <button class="hamburger-btn" onclick="toggleMobileNav()"><i class="fa-solid fa-bars"></i></button>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="page-header">
+            <h1>Explore Adventures 🗺️<small>Find your next journey</small></h1>
+            <div style="display:flex;gap:0.75rem;align-items:center;">
+                <select id="sort-select" onchange="applyFilters()" style="background:var(--bg-input);border:1px solid var(--border);color:white;padding:0.5rem 1rem;border-radius:10px;font-family:inherit;font-size:0.875rem;width:auto;">
+                    <option value="newest">Newest First</option>
+                    <option value="budget-asc">Budget: Low→High</option>
+                    <option value="budget-desc">Budget: High→Low</option>
+                    <option value="date">By Date</option>
+                    <option value="duration">By Duration</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="category-chips" id="category-chips">
+            <button class="category-chip active" data-cat="all" onclick="selectCategory(this)"><i class="fa-solid fa-globe"></i> All</button>
+            <button class="category-chip" data-cat="adventure" onclick="selectCategory(this)"><i class="fa-solid fa-mountain"></i> Adventure</button>
+            <button class="category-chip" data-cat="beach" onclick="selectCategory(this)"><i class="fa-solid fa-umbrella-beach"></i> Beach</button>
+            <button class="category-chip" data-cat="culture" onclick="selectCategory(this)"><i class="fa-solid fa-landmark"></i> Culture</button>
+            <button class="category-chip" data-cat="nature" onclick="selectCategory(this)"><i class="fa-solid fa-leaf"></i> Nature</button>
+            <button class="category-chip" data-cat="other" onclick="selectCategory(this)"><i class="fa-solid fa-ellipsis"></i> Other</button>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-bar">
+            <div class="filter-group">
+                <i class="fa-solid fa-magnifying-glass filter-icon"></i>
+                <input type="text" id="filter-location" placeholder="Search location or title..." oninput="applyFilters()">
+            </div>
+            <div class="filter-group" style="flex:0.5;min-width:150px;">
+                <i class="fa-solid fa-dollar-sign filter-icon"></i>
+                <input type="number" id="filter-budget" placeholder="Max budget" oninput="applyFilters()">
+            </div>
+            <div class="filter-group" style="flex:0.5;min-width:150px;">
+                <i class="fa-regular fa-calendar filter-icon"></i>
+                <input type="date" id="filter-date" oninput="applyFilters()">
+            </div>
+            <div class="filter-group" style="flex:0.4;min-width:120px;">
+                <i class="fa-solid fa-clock filter-icon"></i>
+                <select id="filter-duration" onchange="applyFilters()" style="background:var(--bg-input);border:none;color:white;font-family:inherit;font-size:0.875rem;flex:1;width:auto;">
+                    <option value="">Any duration</option>
+                    <option value="1-3">1–3 days</option>
+                    <option value="4-7">4–7 days</option>
+                    <option value="8-14">1–2 weeks</option>
+                    <option value="15+">2+ weeks</option>
+                </select>
+            </div>
+            <button id="clear-filters" class="btn btn-ghost btn-sm" onclick="clearFilters()" style="width:auto;flex-shrink:0;">
+                <i class="fa-solid fa-xmark"></i> Clear
+            </button>
+        </div>
+
+        <div class="results-header">
+            <span class="results-count" id="results-count"></span>
+        </div>
+
+        <div id="error" class="error-msg" style="margin-bottom:1rem;"></div>
+        <div class="trips-grid" id="trips-grid">
+            <div class="skeleton skeleton-card"></div>
+            <div class="skeleton skeleton-card"></div>
+            <div class="skeleton skeleton-card"></div>
+            <div class="skeleton skeleton-card"></div>
+            <div class="skeleton skeleton-card"></div>
+            <div class="skeleton skeleton-card"></div>
+        </div>
+    </div>
+
+    <!-- Trip Details Modal -->
+    <div id="details-modal" class="modal-overlay">
+        <div class="modal-content">
+            <!-- Image Header -->
+            <div id="modal-image-header" class="modal-image-header"></div>
+
+            <div class="modal-header">
+                <h2 id="modal-title"></h2>
+                <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="modal-tabs">
+                <button class="modal-tab active-tab" id="tab-trip" onclick="switchTab('trip')">
+                    <i class="fa-solid fa-map"></i> Trip Details
+                </button>
+                <button class="modal-tab" id="tab-host" onclick="switchTab('host')">
+                    <i class="fa-solid fa-star"></i> Host Reviews
+                </button>
+                <button class="modal-tab" id="tab-members" onclick="switchTab('members')">
+                    <i class="fa-solid fa-users"></i> Members
+                </button>
+            </div>
+
+            <!-- Trip Tab -->
+            <div id="content-trip">
+                <div id="modal-trip-badges" class="badge-container" style="margin-bottom:1.25rem;"></div>
+                <div class="modal-section">
+                    <h3><i class="fa-solid fa-circle-info"></i> About this Trip</h3>
+                    <p id="modal-description"></p>
+                </div>
+                <div class="modal-section">
+                    <h3><i class="fa-solid fa-list-check"></i> Itinerary</h3>
+                    <p id="modal-itinerary" style="white-space:pre-wrap;"></p>
+                </div>
+                <div id="modal-contact-wrap" class="modal-section" style="display:none;">
+                    <h3><i class="fa-solid fa-phone"></i> Host Contact</h3>
+                    <p id="modal-contact" style="font-family:monospace;color:var(--secondary);"></p>
+                </div>
+                <!-- Modal Join / Share actions -->
+                <div style="display:flex;gap:0.75rem;margin-top:1.5rem;" id="modal-actions"></div>
+            </div>
+
+            <!-- Host Reviews Tab -->
+            <div id="content-host" style="display:none;">
+                <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem;padding:1rem;background:rgba(255,255,255,0.03);border-radius:14px;border:1px solid var(--border);">
+                    <div id="avg-rating-big" style="font-size:2.5rem;font-weight:800;background:linear-gradient(135deg,#f59e0b,#fcd34d);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;"></div>
+                    <div>
+                        <div id="avg-rating" style="color:#f59e0b;letter-spacing:2px;"></div>
+                        <div id="review-count-text" style="font-size:0.8rem;color:var(--text-muted);margin-top:0.2rem;"></div>
+                    </div>
+                </div>
+                <div id="reviews-list" style="margin-bottom:1.5rem;"></div>
+                <div class="modal-section" style="background:rgba(255,255,255,0.03);padding:1.25rem;border-radius:16px;border:1px solid var(--border);">
+                    <h3 style="margin-bottom:1rem;"><i class="fa-solid fa-pen"></i> Leave a Review</h3>
+                    <div class="star-rating" id="star-input">
+                        <input type="radio" name="rating" id="s5" value="5"><label for="s5">★</label>
+                        <input type="radio" name="rating" id="s4" value="4"><label for="s4">★</label>
+                        <input type="radio" name="rating" id="s3" value="3" checked><label for="s3">★</label>
+                        <input type="radio" name="rating" id="s2" value="2"><label for="s2">★</label>
+                        <input type="radio" name="rating" id="s1" value="1"><label for="s1">★</label>
+                    </div>
+                    <textarea id="review-comment" rows="2" placeholder="Share your experience with this host..."></textarea>
+                    <button onclick="postReview()" id="btn-post-review" style="margin-top:0.75rem;">
+                        <i class="fa-solid fa-paper-plane"></i> Post Review
+                    </button>
+                </div>
+            </div>
+
+            <!-- Members Tab -->
+            <div id="content-members" style="display:none;">
+                <p class="text-muted" style="font-size:0.875rem;margin-bottom:1rem;">People who have joined this trip</p>
+                <div id="members-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Top -->
+    <button id="back-to-top" title="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="api.js"></script>
+    <script>
+        const userId = checkAuth();
+        let globalTrips = {};
+        let allTripsArray = [];
+        let activeTripHostId = null;
+        let activeTripId = null;
+        let wishlistSet = new Set();
+        let activeCategory = 'all';
+
+        function selectCategory(btn) {
+            document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            activeCategory = btn.dataset.cat;
+            applyFilters();
+        }
+
+        function clearFilters() {
+            document.getElementById('filter-location').value = '';
+            document.getElementById('filter-budget').value = '';
+            document.getElementById('filter-date').value = '';
+            document.getElementById('filter-duration').value = '';
+            document.querySelector('[data-cat="all"]').click();
+        }
+
+        async function loadTrips() {
+            const errorDiv = document.getElementById('error');
+            try {
+                wishlistSet = await getWishlist();
+                const data = await apiCall('/trips?user_id=' + userId);
+                allTripsArray = data.trips || [];
+                allTripsArray.forEach(t => globalTrips[t._id] = t);
+                renderTrips(allTripsArray);
+            } catch (err) {
+                document.getElementById('trips-grid').innerHTML = '<div class="empty-state"><span class="empty-icon">⚠️</span><p>Failed to load trips. Is the server running?</p></div>';
+                errorDiv.textContent = err.message;
+            }
+        }
+
+        function renderTrips(tripsArray) {
+            const grid = document.getElementById('trips-grid');
+            const countEl = document.getElementById('results-count');
+            countEl.textContent = `${tripsArray.length} trip${tripsArray.length !== 1 ? 's' : ''} found`;
+
+            if (!tripsArray.length) {
+                grid.innerHTML = `<div class="empty-state"><span class="empty-icon">🔍</span><p>No trips match your filters.</p><button class="btn btn-ghost btn-sm" onclick="clearFilters()" style="width:auto;display:inline-flex;margin:0 auto;">Clear filters</button></div>`;
+                return;
+            }
+            grid.innerHTML = tripsArray.map(trip => buildTripCard(trip, wishlistSet, {
+                onJoinCallback: `joinTrip('${trip._id}',${trip.budget})`
+            })).join('');
+        }
+
+        function applyFilters() {
+            const loc = document.getElementById('filter-location').value.toLowerCase();
+            const maxBudget = parseFloat(document.getElementById('filter-budget').value);
+            const date = document.getElementById('filter-date').value;
+            const sort = document.getElementById('sort-select').value;
+            const dur = document.getElementById('filter-duration').value;
+
+            let filtered = allTripsArray.filter(t => {
+                if (loc && !t.location.toLowerCase().includes(loc) && !t.title.toLowerCase().includes(loc)) return false;
+                if (!isNaN(maxBudget) && t.budget > maxBudget) return false;
+                if (date && t.date !== date) return false;
+                if (activeCategory !== 'all' && (t.category || 'other') !== activeCategory) return false;
+                if (dur) {
+                    const days = t.end_date ? Math.round((new Date(t.end_date) - new Date(t.date)) / 86400000) : 0;
+                    if (dur === '1-3' && !(days >= 1 && days <= 3)) return false;
+                    if (dur === '4-7' && !(days >= 4 && days <= 7)) return false;
+                    if (dur === '8-14' && !(days >= 8 && days <= 14)) return false;
+                    if (dur === '15+' && days < 15) return false;
+                }
+                return true;
+            });
+
+            if (sort === 'budget-asc') filtered.sort((a, b) => a.budget - b.budget);
+            else if (sort === 'budget-desc') filtered.sort((a, b) => b.budget - a.budget);
+            else if (sort === 'date') filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
+            else if (sort === 'duration') filtered.sort((a, b) => {
+                const da = a.end_date ? Math.round((new Date(a.end_date) - new Date(a.date)) / 86400000) : 0;
+                const db_ = b.end_date ? Math.round((new Date(b.end_date) - new Date(b.date)) / 86400000) : 0;
+                return db_ - da;
+            });
+
+            renderTrips(filtered);
+        }
+
+        async function joinTrip(tripId, budget) {
+            const btn = document.getElementById(`btn-${tripId}`);
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading...';
+            try {
+                if (budget <= 0) {
+                    await apiCall('/join', 'POST', { user_id: userId, trip_id: tripId });
+                    markAsJoined(tripId, btn);
+                    showToast('🎉 You\'ve joined the trip!');
+                    return;
+                }
+                const orderResp = await apiCall('/payments/create-order', 'POST', { user_id: userId, trip_id: tripId });
+                const options = {
+                    key: "rzp_test_SaivNpwnykyi48",
+                    amount: orderResp.amount,
+                    currency: orderResp.currency,
+                    name: "TripSync",
+                    description: "Trip Joining Fee",
+                    order_id: orderResp.order_id,
+                    handler: async function(response) {
+                        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
+                        try {
+                            await apiCall('/payments/verify-payment', 'POST', { ...response, user_id: userId, trip_id: tripId });
+                            markAsJoined(tripId, btn);
+                            showToast('✅ Payment verified! You\'ve joined the trip.');
+                        } catch (verifyErr) {
+                            showToast('Verification failed: ' + verifyErr.message, 'error');
+                            resetBtn(btn);
+                        }
+                    },
+                    theme: { color: '#7c3aed' }
+                };
+                const rzp = new Razorpay(options);
+                rzp.on('payment.failed', r => { showToast('Payment failed: ' + r.error.description, 'error'); resetBtn(btn); });
+                rzp.open();
+            } catch (err) { resetBtn(btn); showToast(err.message, 'error'); }
+        }
+
+        function markAsJoined(tripId, btn) {
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Joined';
+            btn.className = 'btn btn-success';
+            btn.disabled = true; btn.style.flex = '1';
+            const idx = allTripsArray.findIndex(x => x._id === tripId);
+            if (idx > -1) allTripsArray[idx].is_joined = true;
+            if (globalTrips[tripId]) globalTrips[tripId].is_joined = true;
+        }
+
+        function resetBtn(btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-handshake"></i> Join';
+        }
+
+        function openModal(tripId) {
+            const trip = globalTrips[tripId];
+            if (!trip) return;
+            activeTripHostId = trip.host_id;
+            activeTripId = tripId;
+
+            // Image header
+            const imgHeader = document.getElementById('modal-image-header');
+            imgHeader.style.backgroundImage = `url('${getImageUrl(trip.location)}')`;
+
+            document.getElementById('modal-title').textContent = trip.title;
+            document.getElementById('modal-description').textContent = trip.description || 'No description provided.';
+            document.getElementById('modal-itinerary').textContent = trip.itinerary || 'No specific itinerary provided yet.';
+
+            const duration = getTripDuration(trip.date, trip.end_date);
+            const cat = trip.category || 'other';
+            const catColor = getCategoryColor(cat);
+            const badges = document.getElementById('modal-trip-badges');
+            badges.innerHTML = `
+                <span class="badge badge-location"><i class="fa-solid fa-location-dot"></i> ${trip.location}</span>
+                <span class="badge badge-date"><i class="fa-regular fa-calendar"></i> ${trip.date}</span>
+                ${trip.end_date ? `<span class="badge badge-date"><i class="fa-regular fa-calendar-check"></i> ${trip.end_date}</span>` : ''}
+                <span class="badge badge-budget"><i class="fa-solid fa-dollar-sign"></i> ${trip.budget > 0 ? '$' + trip.budget : 'Free'}</span>
+                ${duration ? `<span class="duration-badge" style="position:static;"><i class="fa-regular fa-clock"></i> ${duration}</span>` : ''}
+                <span class="badge" style="background:rgba(124,58,237,0.12);color:${catColor};border:1px solid ${catColor}33;">
+                    <i class="fa-solid fa-tag"></i> ${cat}
+                </span>
+            `;
+
+            const contactWrap = document.getElementById('modal-contact-wrap');
+            if (trip.contact_info) {
+                contactWrap.style.display = 'block';
+                document.getElementById('modal-contact').textContent = trip.contact_info;
+            } else {
+                contactWrap.style.display = 'none';
+            }
+
+            // Modal actions
+            const actionsEl = document.getElementById('modal-actions');
+            const isFull = trip.max_participants && (trip.current_participants || 0) >= trip.max_participants;
+            actionsEl.innerHTML = `
+                <button class="btn btn-ghost" style="width:auto;flex:0 0 auto;" onclick="shareTrip('${trip.title.replace(/'/g,"\\'")}','${trip.location.replace(/'/g,"\\'")}')">
+                    <i class="fa-solid fa-share-nodes"></i> Share
+                </button>
+                ${trip.is_joined ? '<button disabled class="btn btn-success" style="flex:1;"><i class="fa-solid fa-check"></i> Joined</button>'
+                    : isFull ? '<button disabled class="btn" style="flex:1;background:#1e293b;color:var(--text-dim);">Full</button>'
+                    : `<button onclick="joinTrip('${tripId}',${trip.budget});closeModal();" id="modal-btn-join" style="flex:1;"><i class="fa-solid fa-handshake"></i> Join Trip</button>`
+                }
+            `;
+
+            switchTab('trip');
+            document.getElementById('details-modal').classList.add('active');
+        }
+
+        function switchTab(tab) {
+            ['trip','host','members'].forEach(t => {
+                document.getElementById(`content-${t}`).style.display = t === tab ? 'block' : 'none';
+                document.getElementById(`tab-${t}`).classList.toggle('active-tab', t === tab);
+            });
+            if (tab === 'host') loadHostReviews(activeTripHostId);
+            if (tab === 'members') loadTripMembers(activeTripId);
+        }
+
+        async function loadHostReviews(hostId) {
+            const list = document.getElementById('reviews-list');
+            list.innerHTML = '<div class="skeleton" style="height:60px;width:100%;margin-bottom:8px;"></div><div class="skeleton" style="height:60px;width:100%;"></div>';
+            try {
+                const data = await apiCall('/reviews/' + hostId);
+                document.getElementById('avg-rating-big').textContent = data.total_reviews > 0 ? data.average_rating.toFixed(1) : '—';
+                document.getElementById('avg-rating').innerHTML = data.total_reviews > 0 ? '★'.repeat(Math.round(data.average_rating)) + '☆'.repeat(5 - Math.round(data.average_rating)) : '';
+                document.getElementById('review-count-text').textContent = `${data.total_reviews} review${data.total_reviews !== 1 ? 's' : ''}`;
+                list.innerHTML = data.reviews.length === 0
+                    ? '<p style="color:var(--text-muted);font-style:italic;">Be the first to review this host!</p>'
+                    : data.reviews.map(r => `
+                        <div class="review-card">
+                            <div class="review-header">
+                                <span class="review-reviewer"><i class="fa-solid fa-user-circle" style="color:var(--primary-light);margin-right:0.4rem;"></i>${r.reviewer_name}</span>
+                                <span class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
+                            </div>
+                            ${r.comment ? `<div class="review-comment">${r.comment}</div>` : ''}
+                        </div>`).join('');
+            } catch {
+                list.innerHTML = '<span style="color:var(--danger);">Failed to load reviews.</span>';
+            }
+        }
+
+        async function loadTripMembers(tripId) {
+            const list = document.getElementById('members-list');
+            list.innerHTML = '<div class="skeleton" style="height:50px;width:100%;margin-bottom:8px;"></div>';
+            try {
+                const data = await apiCall('/trip-members/' + tripId);
+                const members = data.members || [];
+                list.innerHTML = members.length === 0
+                    ? '<p style="color:var(--text-muted);font-style:italic;">No members yet. Be the first to join!</p>'
+                    : members.map((m, i) => `
+                        <div style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem;background:rgba(255,255,255,0.03);border-radius:12px;margin-bottom:0.5rem;border:1px solid var(--border);">
+                            <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;flex-shrink:0;">${m.initials || (i + 1)}</div>
+                            <div>
+                                <div style="font-weight:600;font-size:0.9rem;">${m.name || 'Traveler'}</div>
+                                ${m.city ? `<div style="font-size:0.78rem;color:var(--text-muted);"><i class="fa-solid fa-location-dot" style="font-size:0.7rem;margin-right:0.25rem;"></i>${m.city}</div>` : ''}
+                            </div>
+                            <span style="margin-left:auto;font-size:0.72rem;background:rgba(16,185,129,0.12);color:#34d399;border:1px solid rgba(16,185,129,0.25);padding:0.2rem 0.6rem;border-radius:999px;">Member</span>
+                        </div>`).join('');
+            } catch {
+                list.innerHTML = '<span style="color:var(--danger);">Failed to load members.</span>';
+            }
+        }
+
+        async function postReview() {
+            if (!activeTripHostId) return;
+            const btn = document.getElementById('btn-post-review');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Posting...';
+            const selectedRating = document.querySelector('input[name="rating"]:checked');
+            const payload = {
+                host_id: activeTripHostId,
+                reviewer_id: userId,
+                rating: selectedRating ? parseInt(selectedRating.value) : 3,
+                comment: document.getElementById('review-comment').value
+            };
+            try {
+                await apiCall('/reviews', 'POST', payload);
+                document.getElementById('review-comment').value = '';
+                showToast('Review posted! ⭐');
+                await loadHostReviews(activeTripHostId);
+            } catch (e) { showToast(e.message, 'error'); }
+            finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Post Review';
+            }
+        }
+
+        function closeModal() { document.getElementById('details-modal').classList.remove('active'); }
+
+        document.getElementById('details-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        if (userId) loadTrips();
+    </script>
+</body>
+</html>

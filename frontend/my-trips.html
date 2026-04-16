@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Adventures – TripSync</title>
+    <meta name="description" content="View all your hosted and joined trips on TripSync.">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Mobile Nav -->
+    <div id="mobile-nav-overlay"></div>
+    <div id="mobile-nav-drawer">
+        <div class="mobile-nav-header">
+            <a href="home.html" class="logo" onclick="closeMobileNav()">
+                <div class="logo-icon-nav">✈️</div>
+                <span class="logo-text">TripSync</span>
+            </a>
+            <button class="mobile-nav-close" onclick="closeMobileNav()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="mobile-nav-links">
+            <a href="home.html" onclick="closeMobileNav()"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="find-trips.html" onclick="closeMobileNav()"><i class="fa-solid fa-compass"></i> Explore</a>
+            <a href="my-trips.html" class="active" onclick="closeMobileNav()"><i class="fa-solid fa-suitcase"></i> My Trips</a>
+            <a href="wishlist.html" onclick="closeMobileNav()"><i class="fa-solid fa-heart"></i> Wishlist</a>
+            <a href="profile.html" onclick="closeMobileNav()"><i class="fa-solid fa-user"></i> Profile</a>
+            <a href="create-trip.html" class="btn-cta-mobile" onclick="closeMobileNav()"><i class="fa-solid fa-plus"></i> Host a Trip</a>
+            <a href="#" onclick="logout()" style="color:#f87171;margin-top:0.5rem;"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
+        </div>
+    </div>
+
+    <nav class="navbar" id="navbar">
+        <a href="home.html" class="logo">
+            <div class="logo-icon-nav">✈️</div>
+            <span class="logo-text">TripSync</span>
+        </a>
+        <div class="nav-links">
+            <a href="home.html">Home</a>
+            <a href="find-trips.html">Explore</a>
+            <a href="my-trips.html" class="active">My Trips</a>
+            <a href="wishlist.html"><i class="fa-regular fa-heart"></i></a>
+            <a href="create-trip.html" class="btn-primary"><i class="fa-solid fa-plus"></i> Host Trip</a>
+            <a href="profile.html" class="nav-profile-btn" title="My Profile">U</a>
+            <button class="btn-ghost" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+        <button class="hamburger-btn" onclick="toggleMobileNav()"><i class="fa-solid fa-bars"></i></button>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="page-header">
+            <h1>My Adventures 🎒<small>Trips you've hosted and joined</small></h1>
+            <a href="create-trip.html" class="btn btn-sm" style="width:auto;display:inline-flex;">
+                <i class="fa-solid fa-plus"></i> New Trip
+            </a>
+        </div>
+
+        <div class="page-tabs">
+            <button class="page-tab active" id="tab-hosted" onclick="switchTab('hosted')">
+                <i class="fa-solid fa-crown"></i> Hosting
+                <span id="hosted-count" style="background:rgba(124,58,237,0.2);color:#a78bfa;padding:0.1rem 0.5rem;border-radius:999px;font-size:0.75rem;margin-left:0.4rem;">0</span>
+            </button>
+            <button class="page-tab" id="tab-joined" onclick="switchTab('joined')">
+                <i class="fa-solid fa-user-group"></i> Joined
+                <span id="joined-count" style="background:rgba(16,185,129,0.15);color:#34d399;padding:0.1rem 0.5rem;border-radius:999px;font-size:0.75rem;margin-left:0.4rem;">0</span>
+            </button>
+        </div>
+
+        <div id="error" class="error-msg"></div>
+
+        <div id="hosted-section">
+            <div class="trips-grid" id="hosted-grid">
+                <div class="skeleton skeleton-card"></div>
+                <div class="skeleton skeleton-card"></div>
+            </div>
+        </div>
+
+        <div id="joined-section" style="display:none;">
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;padding:0.75rem 1rem;background:rgba(6,182,212,0.06);border:1px solid rgba(6,182,212,0.15);border-radius:12px;font-size:0.85rem;color:#38bdf8;">
+                <i class="fa-solid fa-circle-info"></i>
+                Changed your mind? Use the <strong>Leave</strong> button on any trip to drop out.
+            </div>
+            <div class="trips-grid" id="joined-grid">
+                <div class="skeleton skeleton-card"></div>
+                <div class="skeleton skeleton-card"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Top -->
+    <button id="back-to-top" title="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
+
+    <script src="api.js"></script>
+    <script>
+        const userId = checkAuth();
+
+        function switchTab(tab) {
+            ['hosted','joined'].forEach(t => {
+                document.getElementById(`${t}-section`).style.display = t === tab ? 'block' : 'none';
+                document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
+            });
+        }
+
+        // openModal on my-trips just redirects to find-trips
+        function openModal() { window.location.href = 'find-trips.html'; }
+
+        async function loadMyTrips() {
+            const hostedGrid = document.getElementById('hosted-grid');
+            const joinedGrid = document.getElementById('joined-grid');
+            try {
+                const data = await apiCall('/trips/my-trips?user_id=' + userId);
+                document.getElementById('hosted-count').textContent = data.hosted.length;
+                document.getElementById('joined-count').textContent = data.joined.length;
+
+                hostedGrid.innerHTML = data.hosted.length === 0
+                    ? `<div class="empty-state"><span class="empty-icon">🚀</span><p>You haven't hosted any trips yet.</p><a href="create-trip.html" class="btn btn-sm" style="width:auto;display:inline-flex;margin:0 auto;">Host your first trip</a></div>`
+                    : data.hosted.map(trip => buildTripCard(trip, new Set(), { isHostCard: true })).join('');
+
+                joinedGrid.innerHTML = data.joined.length === 0
+                    ? `<div class="empty-state"><span class="empty-icon">🌍</span><p>You haven't joined any trips yet.</p><a href="find-trips.html" class="btn btn-sm btn-ghost" style="width:auto;display:inline-flex;margin:0 auto;">Discover adventures</a></div>`
+                    : data.joined.map(trip => buildTripCard(trip, new Set(), { showLeave: true })).join('');
+
+            } catch (err) {
+                showToast(err.message, 'error');
+                hostedGrid.innerHTML = '';
+                joinedGrid.innerHTML = '';
+            }
+        }
+
+        if (userId) loadMyTrips();
+    </script>
+</body>
+</html>

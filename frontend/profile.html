@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile – TripSync</title>
+    <meta name="description" content="View and edit your TripSync profile.">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Mobile Nav -->
+    <div id="mobile-nav-overlay"></div>
+    <div id="mobile-nav-drawer">
+        <div class="mobile-nav-header">
+            <a href="home.html" class="logo" onclick="closeMobileNav()">
+                <div class="logo-icon-nav">✈️</div>
+                <span class="logo-text">TripSync</span>
+            </a>
+            <button class="mobile-nav-close" onclick="closeMobileNav()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="mobile-nav-links">
+            <a href="home.html" onclick="closeMobileNav()"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="find-trips.html" onclick="closeMobileNav()"><i class="fa-solid fa-compass"></i> Explore</a>
+            <a href="my-trips.html" onclick="closeMobileNav()"><i class="fa-solid fa-suitcase"></i> My Trips</a>
+            <a href="wishlist.html" onclick="closeMobileNav()"><i class="fa-solid fa-heart"></i> Wishlist</a>
+            <a href="profile.html" class="active" onclick="closeMobileNav()"><i class="fa-solid fa-user"></i> Profile</a>
+            <a href="create-trip.html" class="btn-cta-mobile" onclick="closeMobileNav()"><i class="fa-solid fa-plus"></i> Host a Trip</a>
+            <a href="#" onclick="logout()" style="color:#f87171;margin-top:0.5rem;"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
+        </div>
+    </div>
+
+    <nav class="navbar" id="navbar">
+        <a href="home.html" class="logo">
+            <div class="logo-icon-nav">✈️</div>
+            <span class="logo-text">TripSync</span>
+        </a>
+        <div class="nav-links">
+            <a href="home.html">Home</a>
+            <a href="find-trips.html">Explore</a>
+            <a href="my-trips.html">My Trips</a>
+            <a href="wishlist.html"><i class="fa-regular fa-heart"></i></a>
+            <a href="create-trip.html" class="btn-primary"><i class="fa-solid fa-plus"></i> Host Trip</a>
+            <a href="profile.html" class="nav-profile-btn active" title="My Profile">U</a>
+            <button class="btn-ghost" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+        <button class="hamburger-btn" onclick="toggleMobileNav()"><i class="fa-solid fa-bars"></i></button>
+    </nav>
+
+    <div class="profile-container">
+        <!-- Profile Header -->
+        <div class="profile-header-card" id="profile-header">
+            <div style="position:relative;flex-shrink:0;">
+                <div class="profile-avatar" id="profile-avatar">?</div>
+                <div id="profile-verified-ring" style="display:none;position:absolute;inset:-3px;border-radius:50%;border:2px solid #10b981;"></div>
+            </div>
+            <div class="profile-info" style="flex:1;">
+                <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;margin-bottom:0.3rem;">
+                    <h2 id="profile-name" style="margin:0;">Loading...</h2>
+                    <span id="verify-badge" class="verify-status unverified" style="display:none;"></span>
+                </div>
+                <div class="profile-city" id="profile-city">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <span>—</span>
+                </div>
+                <div id="profile-bio-text" style="margin-top:0.5rem;font-size:0.875rem;color:var(--text-muted);max-width:350px;line-height:1.6;"></div>
+                <div id="profile-interests-display" class="interest-chips" style="margin-top:0.75rem;"></div>
+            </div>
+            <div class="profile-stats">
+                <div class="profile-stat">
+                    <div class="profile-stat-value" id="stat-hosted">0</div>
+                    <div class="profile-stat-label">Hosted</div>
+                </div>
+                <div class="profile-stat">
+                    <div class="profile-stat-value" id="stat-joined">0</div>
+                    <div class="profile-stat-label">Joined</div>
+                </div>
+                <div class="profile-stat">
+                    <div class="profile-stat-value" id="stat-reviews">—</div>
+                    <div class="profile-stat-label">Rating</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Host Verification Card -->
+        <div class="glass-card" id="verify-card" style="max-width:100%;margin-bottom:2rem;padding:1.5rem 2rem;">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+                <div style="display:flex;align-items:center;gap:1rem;">
+                    <div style="width:44px;height:44px;border-radius:12px;background:rgba(124,58,237,0.15);display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex-shrink:0;">🛡️</div>
+                    <div>
+                        <div style="font-weight:700;font-size:0.95rem;" id="verify-card-title">Become a Verified Host</div>
+                        <div style="font-size:0.8rem;color:var(--text-muted);" id="verify-card-desc">Apply for verification to unlock trip hosting on TripSync.</div>
+                    </div>
+                </div>
+                <div id="verify-card-action"></div>
+            </div>
+        </div>
+
+        <!-- Edit Profile -->
+        <div class="glass-card" style="max-width:100%;margin-bottom:2rem;">
+            <h2 style="font-size:1.1rem;text-align:left;margin-bottom:1.5rem;display:flex;align-items:center;gap:0.5rem;">
+                <i class="fa-solid fa-pen" style="color:var(--primary-light);"></i> Edit Profile
+            </h2>
+            <form id="edit-form">
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label for="edit-name">Full Name</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-user input-icon"></i>
+                            <input type="text" id="edit-name" placeholder="Your name">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-city">City</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-city input-icon"></i>
+                            <input type="text" id="edit-city" placeholder="Your city">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-bio">Bio</label>
+                    <textarea id="edit-bio" rows="2" placeholder="Tell other travelers about yourself..."></textarea>
+                </div>
+
+                <!-- Travel Interests -->
+                <div class="form-group">
+                    <label>Travel Interests <span style="color:var(--text-dim);font-weight:400;">(select all that apply)</span></label>
+                    <div class="interest-chips" id="interests-selector"></div>
+                </div>
+
+                <div id="edit-error" class="error-msg"></div>
+                <div style="display:flex;gap:0.75rem;">
+                    <button type="submit" id="save-btn" style="flex:1;">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Host Reviews -->
+        <div class="glass-card" style="max-width:100%;">
+            <h2 style="font-size:1.1rem;text-align:left;margin-bottom:1.5rem;display:flex;align-items:center;gap:0.5rem;">
+                <i class="fa-solid fa-star" style="color:#f59e0b;"></i> My Host Reviews
+            </h2>
+            <div id="my-reviews">
+                <div class="skeleton" style="height:60px;width:100%;margin-bottom:8px;"></div>
+                <div class="skeleton" style="height:60px;width:100%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Top -->
+    <button id="back-to-top" title="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
+
+    <script src="api.js"></script>
+    <script>
+        const userId = checkAuth();
+
+        const ALL_INTERESTS = [
+            '🏔️ Adventure', '🏖️ Beach', '🏛️ Culture', '🌿 Nature', '🍜 Food',
+            '📸 Photography', '🎒 Backpacking', '🚵 Sports', '🧘 Wellness', '🎭 Nightlife'
+        ];
+        let selectedInterests = [];
+
+        function getInitials(name) {
+            if (!name) return '?';
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        }
+
+        function renderInterestSelector(existing = []) {
+            selectedInterests = [...existing];
+            const el = document.getElementById('interests-selector');
+            el.innerHTML = ALL_INTERESTS.map(interest => `
+                <button type="button" class="interest-chip ${existing.includes(interest) ? 'selected' : ''}"
+                    onclick="toggleInterest(this, '${interest}')">
+                    ${interest}
+                </button>`).join('');
+        }
+
+        function toggleInterest(btn, interest) {
+            btn.classList.toggle('selected');
+            if (btn.classList.contains('selected')) {
+                if (!selectedInterests.includes(interest)) selectedInterests.push(interest);
+            } else {
+                selectedInterests = selectedInterests.filter(i => i !== interest);
+            }
+        }
+
+        function renderVerificationCard(status) {
+            const title = document.getElementById('verify-card-title');
+            const desc = document.getElementById('verify-card-desc');
+            const action = document.getElementById('verify-card-action');
+            const badge = document.getElementById('verify-badge');
+            const ring = document.getElementById('profile-verified-ring');
+
+            badge.style.display = 'inline-flex';
+
+            if (status === 'verified') {
+                badge.className = 'verify-status verified';
+                badge.innerHTML = '<i class="fa-solid fa-shield-check"></i> Verified Host';
+                ring.style.display = 'block';
+                title.textContent = '✅ Verified Host';
+                desc.textContent = 'You are a verified host. You can create and host trips on TripSync.';
+                action.innerHTML = '<span class="verify-status verified"><i class="fa-solid fa-shield-check"></i> Active</span>';
+                document.getElementById('verify-card').style.borderColor = 'rgba(16,185,129,0.25)';
+                document.getElementById('verify-card').style.background = 'rgba(16,185,129,0.04)';
+            } else if (status === 'pending') {
+                badge.className = 'verify-status pending';
+                badge.innerHTML = '<i class="fa-regular fa-clock"></i> Pending';
+                title.textContent = '⏳ Verification Under Review';
+                desc.textContent = 'Your application is being reviewed by our team. We\'ll notify you once it\'s approved.';
+                action.innerHTML = '<span class="verify-status pending"><i class="fa-regular fa-clock"></i> Pending Review</span>';
+                document.getElementById('verify-card').style.borderColor = 'rgba(245,158,11,0.25)';
+            } else {
+                badge.className = 'verify-status unverified';
+                badge.innerHTML = '<i class="fa-solid fa-shield-xmark"></i> Not Verified';
+                title.textContent = 'Become a Verified Host';
+                desc.textContent = 'Apply for verification to unlock trip hosting on TripSync. Our team reviews all applications.';
+                action.innerHTML = `<button class="btn btn-sm" style="width:auto;" onclick="applyVerification()">
+                    <i class="fa-solid fa-paper-plane"></i> Apply Now
+                </button>`;
+            }
+        }
+
+        async function applyVerification() {
+            const btn = event.currentTarget;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
+            try {
+                await apiCall(`/users/${userId}/request-verification`, 'POST');
+                setVerificationStatus('pending');
+                renderVerificationCard('pending');
+                showToast('✅ Verification request submitted! We\'ll review it shortly.');
+            } catch (e) {
+                showToast(e.message, 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Apply Now';
+            }
+        }
+
+        async function loadProfile() {
+            try {
+                const data = await apiCall(`/users/${userId}`);
+                const user = data.user;
+
+                document.getElementById('profile-avatar').textContent = getInitials(user.name);
+                document.getElementById('profile-name').textContent = user.name || 'Unknown';
+                document.getElementById('profile-city').innerHTML = `<i class="fa-solid fa-location-dot"></i> <span>${user.city || 'No city set'}</span>`;
+                document.getElementById('profile-bio-text').textContent = user.bio || '';
+
+                // Interests display
+                const interestsDisplay = document.getElementById('profile-interests-display');
+                const interests = user.interests || [];
+                interestsDisplay.innerHTML = interests.length > 0
+                    ? interests.map(i => `<span class="interest-chip selected" style="cursor:default;">${i}</span>`).join('')
+                    : '';
+
+                // Pre-fill edit form
+                document.getElementById('edit-name').value = user.name || '';
+                document.getElementById('edit-city').value = user.city || '';
+                document.getElementById('edit-bio').value = user.bio || '';
+                renderInterestSelector(user.interests || []);
+
+                // Verification
+                const vStatus = user.verification_status || 'unverified';
+                const vVerified = user.is_verified || false;
+                setVerified(vVerified);
+                setVerificationStatus(vStatus);
+                renderVerificationCard(vStatus);
+                renderNavProfile();
+
+                // Update local name
+                setUsername(user.name || '');
+                renderNavProfile();
+
+                // Stats
+                const tripsData = await apiCall('/trips/my-trips?user_id=' + userId);
+                document.getElementById('stat-hosted').textContent = tripsData.hosted.length;
+                document.getElementById('stat-joined').textContent = tripsData.joined.length;
+
+                await loadMyReviews();
+            } catch (err) {
+                showToast('Failed to load profile: ' + err.message, 'error');
+            }
+        }
+
+        async function loadMyReviews() {
+            const container = document.getElementById('my-reviews');
+            try {
+                const data = await apiCall('/reviews/' + userId);
+                document.getElementById('stat-reviews').textContent = data.total_reviews > 0
+                    ? data.average_rating.toFixed(1) + '★' : '—';
+                container.innerHTML = data.reviews.length === 0
+                    ? '<p style="color:var(--text-muted);font-style:italic;">No reviews yet. Host a trip to start earning reviews!</p>'
+                    : data.reviews.map(r => `
+                        <div class="review-card">
+                            <div class="review-header">
+                                <span class="review-reviewer"><i class="fa-solid fa-user-circle" style="color:var(--primary-light);margin-right:0.4rem;"></i>${r.reviewer_name}</span>
+                                <span class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
+                            </div>
+                            ${r.comment ? `<div class="review-comment">${r.comment}</div>` : ''}
+                        </div>`).join('');
+            } catch {
+                container.innerHTML = '<span style="color:var(--danger);">Failed to load reviews.</span>';
+            }
+        }
+
+        document.getElementById('edit-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('save-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+            const data = {
+                name: document.getElementById('edit-name').value,
+                city: document.getElementById('edit-city').value,
+                bio: document.getElementById('edit-bio').value,
+                interests: selectedInterests
+            };
+            try {
+                await apiCall(`/users/${userId}`, 'PUT', data);
+                setUsername(data.name);
+                renderNavProfile();
+                document.getElementById('profile-name').textContent = data.name;
+                document.getElementById('profile-avatar').textContent = getInitials(data.name);
+                document.getElementById('profile-city').innerHTML = `<i class="fa-solid fa-location-dot"></i> <span>${data.city}</span>`;
+                document.getElementById('profile-bio-text').textContent = data.bio;
+                document.getElementById('profile-interests-display').innerHTML = selectedInterests.length > 0
+                    ? selectedInterests.map(i => `<span class="interest-chip selected" style="cursor:default;">${i}</span>`).join('')
+                    : '';
+                showToast('Profile updated! ✨');
+            } catch (err) {
+                document.getElementById('edit-error').innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${err.message}`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Changes';
+            }
+        });
+
+        if (userId) loadProfile();
+    </script>
+</body>
+</html>

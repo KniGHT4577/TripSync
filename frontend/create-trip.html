@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Host a Trip – TripSync</title>
+    <meta name="description" content="Create and host your own travel adventure on TripSync.">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .create-layout {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 2rem;
+            max-width: 1100px;
+            margin: 2.5rem auto;
+            padding: 0 2rem;
+        }
+        @media (max-width: 900px) { .create-layout { grid-template-columns: 1fr; } }
+        .tips-card {
+            background: rgba(13,19,33,0.7);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            height: fit-content;
+            position: sticky;
+            top: 90px;
+        }
+        .tip-item {
+            display: flex;
+            gap: 0.75rem;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.875rem;
+        }
+        .tip-item:last-child { border-bottom: none; }
+        .tip-icon {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; flex-shrink: 0;
+        }
+        .step-indicator { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem; }
+        .step-num {
+            width: 22px; height: 22px; border-radius: 50%;
+            background: rgba(124,58,237,0.2); color: #a78bfa;
+            font-size: 0.75rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .step-label { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    </style>
+</head>
+<body>
+    <!-- Mobile Nav -->
+    <div id="mobile-nav-overlay"></div>
+    <div id="mobile-nav-drawer">
+        <div class="mobile-nav-header">
+            <a href="home.html" class="logo" onclick="closeMobileNav()">
+                <div class="logo-icon-nav">✈️</div>
+                <span class="logo-text">TripSync</span>
+            </a>
+            <button class="mobile-nav-close" onclick="closeMobileNav()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="mobile-nav-links">
+            <a href="home.html" onclick="closeMobileNav()"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="find-trips.html" onclick="closeMobileNav()"><i class="fa-solid fa-compass"></i> Explore</a>
+            <a href="my-trips.html" onclick="closeMobileNav()"><i class="fa-solid fa-suitcase"></i> My Trips</a>
+            <a href="wishlist.html" onclick="closeMobileNav()"><i class="fa-solid fa-heart"></i> Wishlist</a>
+            <a href="profile.html" onclick="closeMobileNav()"><i class="fa-solid fa-user"></i> Profile</a>
+            <a href="create-trip.html" class="btn-cta-mobile active" onclick="closeMobileNav()"><i class="fa-solid fa-plus"></i> Host a Trip</a>
+            <a href="#" onclick="logout()" style="color:#f87171;margin-top:0.5rem;"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
+        </div>
+    </div>
+
+    <nav class="navbar" id="navbar">
+        <a href="home.html" class="logo">
+            <div class="logo-icon-nav">✈️</div>
+            <span class="logo-text">TripSync</span>
+        </a>
+        <div class="nav-links">
+            <a href="home.html">Home</a>
+            <a href="find-trips.html">Explore</a>
+            <a href="my-trips.html">My Trips</a>
+            <a href="wishlist.html"><i class="fa-regular fa-heart"></i></a>
+            <a href="create-trip.html" class="active btn-primary"><i class="fa-solid fa-plus"></i> Host Trip</a>
+            <a href="profile.html" class="nav-profile-btn" title="My Profile">U</a>
+            <button class="btn-ghost" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+        <button class="hamburger-btn" onclick="toggleMobileNav()"><i class="fa-solid fa-bars"></i></button>
+    </nav>
+
+    <!-- Verification Gate (shown if not verified) -->
+    <div id="verify-gate-section" style="display:none;max-width:700px;margin:3rem auto;padding:0 2rem;">
+        <div class="glass-card" style="max-width:100%;">
+            <div class="verify-gate">
+                <div class="verify-gate-icon">🛡️</div>
+                <h2>Host Verification Required</h2>
+                <p>Only verified hosts can create trips on TripSync. This ensures a safe and trustworthy experience for all travelers.</p>
+                <div id="gate-status-area"></div>
+                <div style="display:flex;gap:0.75rem;flex-wrap:wrap;justify-content:center;">
+                    <a href="profile.html" class="btn" style="width:auto;">
+                        <i class="fa-solid fa-paper-plane"></i> Apply for Verification
+                    </a>
+                    <a href="find-trips.html" class="btn btn-ghost" style="width:auto;">
+                        <i class="fa-solid fa-compass"></i> Explore Trips Instead
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trip Form (shown if verified) -->
+    <div id="create-form-section" style="display:none;">
+        <div class="create-layout">
+            <!-- Form -->
+            <div>
+                <div style="margin-bottom:2rem;">
+                    <h1 style="font-size:2rem;font-weight:800;letter-spacing:-0.03em;">Host a Trip ✈️</h1>
+                    <p class="text-muted" style="margin-top:0.4rem;">Share your adventure and find travel companions</p>
+                </div>
+
+                <div class="glass-card" style="max-width:100%;padding:2rem;">
+                    <form id="create-trip-form">
+                        <!-- Step 1 -->
+                        <div class="step-indicator">
+                            <div class="step-num">1</div>
+                            <span class="step-label">Basic Information</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="title">Trip Title *</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-pen-to-square input-icon"></i>
+                                <input type="text" id="title" required placeholder="e.g. Summer Backpacking in Bali" oninput="updatePreview()">
+                            </div>
+                        </div>
+                        <div class="form-grid-2">
+                            <div class="form-group">
+                                <label for="location">Destination *</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-location-dot input-icon"></i>
+                                    <input type="text" id="location" required placeholder="Bali, Indonesia" oninput="updatePreview()">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="category">Category</label>
+                                <select id="category" onchange="updatePreview()">
+                                    <option value="adventure">🏔️ Adventure</option>
+                                    <option value="beach">🏖️ Beach</option>
+                                    <option value="culture">🏛️ Culture</option>
+                                    <option value="nature">🌿 Nature</option>
+                                    <option value="other" selected>✈️ Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Trip Description *</label>
+                            <textarea id="description" rows="3" required placeholder="Describe your trip — what you'll do, who it's for, why it'll be amazing..." oninput="countChars(this, 'desc-count', 500); updatePreview()"></textarea>
+                            <div class="char-counter" id="desc-count">0 / 500</div>
+                        </div>
+
+                        <div style="height:1px;background:var(--border);margin:1.5rem 0;"></div>
+
+                        <!-- Step 2 -->
+                        <div class="step-indicator">
+                            <div class="step-num">2</div>
+                            <span class="step-label">Schedule & Budget</span>
+                        </div>
+                        <div class="form-grid-2">
+                            <div class="form-group">
+                                <label for="date">Departure Date *</label>
+                                <input type="date" id="date" required oninput="updatePreview()">
+                            </div>
+                            <div class="form-group">
+                                <label for="end_date">Return Date</label>
+                                <input type="date" id="end_date" oninput="updatePreview()">
+                            </div>
+                        </div>
+                        <div class="form-grid-2">
+                            <div class="form-group">
+                                <label for="budget">Cost per Person (USD)</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-dollar-sign input-icon"></i>
+                                    <input type="number" id="budget" min="0" placeholder="0 = Free trip" oninput="updatePreview()">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="max_participants">Max Participants</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-users input-icon"></i>
+                                    <input type="number" id="max_participants" min="1" placeholder="Leave blank = unlimited">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="height:1px;background:var(--border);margin:1.5rem 0;"></div>
+
+                        <!-- Step 3 -->
+                        <div class="step-indicator">
+                            <div class="step-num">3</div>
+                            <span class="step-label">Trip Details</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="itinerary">Itinerary <span style="color:var(--text-dim);font-weight:400;">(optional but recommended)</span></label>
+                            <textarea id="itinerary" rows="5" placeholder="Day 1: Arrive in Bali, check in at hotel, evening beach walk&#10;Day 2: Sunrise at Tanah Lot temple, afternoon surfing&#10;Day 3: Ubud rice terraces & monkey forest&#10;Day 4: Cooking class & farewell dinner&#10;Day 5: Departure" oninput="countChars(this, 'itin-count', 1000)"></textarea>
+                            <div class="char-counter" id="itin-count">0 / 1000</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact_info">Contact Info <span style="color:var(--text-dim);font-weight:400;">(optional)</span></label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-phone input-icon"></i>
+                                <input type="text" id="contact_info" placeholder="WhatsApp / Email / Telegram">
+                            </div>
+                        </div>
+
+                        <div id="error" class="error-msg"></div>
+                        <button type="submit" id="submit-btn" style="margin-top:1rem;">
+                            <i class="fa-solid fa-paper-plane"></i> Publish Trip
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Sidebar: Live Preview + Tips -->
+            <div>
+                <!-- Live Preview -->
+                <div style="margin-bottom:1.5rem;">
+                    <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-dim);margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem;">
+                        <i class="fa-solid fa-eye"></i> Live Preview
+                    </div>
+                    <div class="preview-card">
+                        <div class="preview-image" id="preview-img">
+                            <span class="category-tag" style="position:static;" id="preview-cat">✈️ other</span>
+                        </div>
+                        <div class="preview-content">
+                            <div class="preview-title" id="preview-title">Your trip title will appear here...</div>
+                            <div class="badge-container" id="preview-badges">
+                                <span class="badge badge-location"><i class="fa-solid fa-location-dot"></i> Destination</span>
+                                <span class="badge badge-date"><i class="fa-regular fa-calendar"></i> Date</span>
+                                <span class="badge badge-budget"><i class="fa-solid fa-dollar-sign"></i> Free</span>
+                            </div>
+                            <div id="preview-duration" style="margin-top:0.5rem;font-size:0.78rem;color:var(--text-dim);"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tips -->
+                <div class="tips-card">
+                    <h3 style="font-size:1rem;font-weight:700;margin-bottom:1.25rem;display:flex;align-items:center;gap:0.5rem;">
+                        <i class="fa-solid fa-lightbulb" style="color:#f59e0b;"></i> Hosting Tips
+                    </h3>
+                    <div class="tip-item">
+                        <div class="tip-icon" style="background:rgba(124,58,237,0.12);color:#a78bfa;"><i class="fa-solid fa-pen"></i></div>
+                        <div>
+                            <div style="font-weight:600;margin-bottom:0.2rem;">Be descriptive</div>
+                            <div class="text-muted">A detailed description gets 3× more join requests.</div>
+                        </div>
+                    </div>
+                    <div class="tip-item">
+                        <div class="tip-icon" style="background:rgba(16,185,129,0.12);color:#34d399;"><i class="fa-solid fa-list-check"></i></div>
+                        <div>
+                            <div style="font-weight:600;margin-bottom:0.2rem;">Add a day-by-day itinerary</div>
+                            <div class="text-muted">Plans build trust and set clear expectations.</div>
+                        </div>
+                    </div>
+                    <div class="tip-item">
+                        <div class="tip-icon" style="background:rgba(6,182,212,0.12);color:#38bdf8;"><i class="fa-solid fa-calendar-days"></i></div>
+                        <div>
+                            <div style="font-weight:600;margin-bottom:0.2rem;">Set both dates</div>
+                            <div class="text-muted">Start + end date shows trip duration clearly.</div>
+                        </div>
+                    </div>
+                    <div class="tip-item">
+                        <div class="tip-icon" style="background:rgba(245,158,11,0.12);color:#fbbf24;"><i class="fa-solid fa-users"></i></div>
+                        <div>
+                            <div style="font-weight:600;margin-bottom:0.2rem;">Limit group size</div>
+                            <div class="text-muted">Smaller groups (4–8) tend to have better experiences.</div>
+                        </div>
+                    </div>
+                    <div style="margin-top:1.5rem;padding:1rem;background:rgba(124,58,237,0.08);border-radius:12px;border:1px solid rgba(124,58,237,0.2);">
+                        <p style="font-size:0.8rem;color:#c4b5fd;text-align:center;">Your trip will be visible to <strong>all travelers</strong> on TripSync instantly after publishing.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Top -->
+    <button id="back-to-top" title="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
+
+    <script src="api.js"></script>
+    <script>
+        const userId = checkAuth();
+
+        // Set min dates
+        document.getElementById('date').min = new Date().toISOString().split('T')[0];
+        document.getElementById('end_date').min = new Date().toISOString().split('T')[0];
+
+        // Character counter
+        function countChars(textarea, counterId, max) {
+            const len = textarea.value.length;
+            const el = document.getElementById(counterId);
+            el.textContent = `${len} / ${max}`;
+            el.className = 'char-counter' + (len > max * 0.9 ? ' warn' : '') + (len > max ? ' over' : '');
+        }
+
+        // Live preview updater
+        function updatePreview() {
+            const title = document.getElementById('title').value || 'Your trip title will appear here...';
+            const location = document.getElementById('location').value || 'Destination';
+            const date = document.getElementById('date').value || 'Date';
+            const endDate = document.getElementById('end_date').value;
+            const budget = document.getElementById('budget').value;
+            const cat = document.getElementById('category').value || 'other';
+            const catColor = getCategoryColor(cat);
+            const catIcon = getCategoryIcon(cat);
+            const duration = getTripDuration(date, endDate);
+
+            document.getElementById('preview-title').textContent = title;
+            document.getElementById('preview-img').style.backgroundImage = location !== 'Destination' ? `url('${getImageUrl(location)}')` : '';
+            document.getElementById('preview-cat').style.color = catColor;
+            document.getElementById('preview-cat').innerHTML = `<i class="fa-solid ${catIcon}"></i> ${cat}`;
+            document.getElementById('preview-badges').innerHTML = `
+                <span class="badge badge-location"><i class="fa-solid fa-location-dot"></i> ${location}</span>
+                <span class="badge badge-date"><i class="fa-regular fa-calendar"></i> ${date}</span>
+                <span class="badge badge-budget"><i class="fa-solid fa-dollar-sign"></i> ${budget > 0 ? '$'+budget : 'Free'}</span>
+            `;
+            document.getElementById('preview-duration').innerHTML = duration
+                ? `<i class="fa-regular fa-clock" style="margin-right:0.3rem;"></i>${duration}`
+                : '';
+        }
+
+        async function checkVerificationAndShow() {
+            try {
+                const data = await apiCall(`/users/${userId}`);
+                const user = data.user;
+                const vStatus = user.verification_status || 'unverified';
+                const vVerified = user.is_verified || false;
+
+                setVerified(vVerified);
+                setVerificationStatus(vStatus);
+                renderNavProfile();
+
+                if (vVerified) {
+                    document.getElementById('create-form-section').style.display = 'block';
+                } else {
+                    document.getElementById('verify-gate-section').style.display = 'block';
+                    const statusArea = document.getElementById('gate-status-area');
+                    if (vStatus === 'pending') {
+                        statusArea.innerHTML = `<div class="verify-status pending" style="justify-content:center;margin-bottom:0.5rem;"><i class="fa-regular fa-clock"></i> Your application is pending review — sit tight!</div>`;
+                    }
+                }
+            } catch {
+                // If we can't verify, show the form and let backend reject
+                document.getElementById('create-form-section').style.display = 'block';
+            }
+        }
+
+        document.getElementById('create-trip-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            const budgetVal = document.getElementById('budget').value;
+            const maxParts = document.getElementById('max_participants').value;
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Publishing...';
+
+            const data = {
+                title: document.getElementById('title').value,
+                location: document.getElementById('location').value,
+                date: document.getElementById('date').value,
+                end_date: document.getElementById('end_date').value || null,
+                budget: budgetVal ? parseFloat(budgetVal) : 0,
+                host_id: userId,
+                description: document.getElementById('description').value,
+                itinerary: document.getElementById('itinerary').value,
+                category: document.getElementById('category').value,
+                max_participants: maxParts ? parseInt(maxParts) : null,
+                contact_info: document.getElementById('contact_info').value || null
+            };
+
+            try {
+                await apiCall('/trip', 'POST', data);
+                showToast('Trip published successfully! 🎉');
+                setTimeout(() => window.location.href = 'my-trips.html', 1500);
+            } catch (err) {
+                document.getElementById('error').innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${err.message}`;
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Publish Trip';
+            }
+        });
+
+        if (userId) checkVerificationAndShow();
+        updatePreview(); // Initialize preview
+    </script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripSync – Solo Travel, Together</title>
+    <meta name="description" content="Connect with solo travelers, share costs, and explore the world on TripSync.">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Mobile Nav Overlay + Drawer -->
+    <div id="mobile-nav-overlay"></div>
+    <div id="mobile-nav-drawer">
+        <div class="mobile-nav-header">
+            <a href="home.html" class="logo" onclick="closeMobileNav()">
+                <div class="logo-icon-nav">✈️</div>
+                <span class="logo-text">TripSync</span>
+            </a>
+            <button class="mobile-nav-close" onclick="closeMobileNav()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="mobile-nav-links">
+            <a href="home.html" class="active" onclick="closeMobileNav()"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="find-trips.html" onclick="closeMobileNav()"><i class="fa-solid fa-compass"></i> Explore</a>
+            <a href="my-trips.html" onclick="closeMobileNav()"><i class="fa-solid fa-suitcase"></i> My Trips</a>
+            <a href="wishlist.html" onclick="closeMobileNav()"><i class="fa-solid fa-heart"></i> Wishlist</a>
+            <a href="profile.html" onclick="closeMobileNav()"><i class="fa-solid fa-user"></i> Profile</a>
+            <a href="create-trip.html" class="btn-cta-mobile" onclick="closeMobileNav()"><i class="fa-solid fa-plus"></i> Host a Trip</a>
+            <a href="#" onclick="logout()" style="color:#f87171;margin-top:0.5rem;"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
+        </div>
+    </div>
+
+    <nav class="navbar" id="navbar">
+        <a href="home.html" class="logo">
+            <div class="logo-icon-nav">✈️</div>
+            <span class="logo-text">TripSync</span>
+        </a>
+        <div class="nav-links">
+            <a href="home.html" class="active">Home</a>
+            <a href="find-trips.html">Explore</a>
+            <a href="my-trips.html">My Trips</a>
+            <a href="wishlist.html" id="nav-wishlist-link" title="Wishlist"><i class="fa-regular fa-heart"></i></a>
+            <a href="create-trip.html" class="btn-primary"><i class="fa-solid fa-plus"></i> Host Trip</a>
+            <a href="profile.html" class="nav-profile-btn" title="My Profile">U</a>
+            <button class="btn-ghost" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+        <button class="hamburger-btn" onclick="toggleMobileNav()" aria-label="Open menu">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-badge">
+            <i class="fa-solid fa-globe fa-spin" style="animation-duration:3s;"></i>
+            The Solo Traveler's Network
+        </div>
+        <h1>
+            Travel Further,<br>
+            <span class="gradient-text">Together</span>
+        </h1>
+        <p>Connect with adventurous solo travelers, split costs, share itineraries, and create memories that last a lifetime.</p>
+        <div class="hero-actions">
+            <a href="find-trips.html" class="btn btn-cta">
+                <i class="fa-solid fa-compass"></i> Discover Adventures
+            </a>
+            <a href="create-trip.html" class="btn btn-ghost btn-cta" style="width:auto;">
+                <i class="fa-solid fa-map-location-dot"></i> Host a Trip
+            </a>
+        </div>
+        <div class="stats-strip" id="stats-strip">
+            <div class="stat-item">
+                <div class="stat-value" id="stat-trips">—</div>
+                <div class="stat-label">Active Trips</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="stat-travelers">—</div>
+                <div class="stat-label">Travelers</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="stat-countries">50+</div>
+                <div class="stat-label">Countries</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="stat-dest">—</div>
+                <div class="stat-label">Destinations</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works">
+        <div class="text-center" style="margin-bottom:2.5rem;">
+            <h2 style="font-size:1.75rem;font-weight:800;letter-spacing:-0.03em;">How TripSync Works</h2>
+            <p class="text-muted" style="margin-top:0.5rem;">Three simple steps to your next adventure</p>
+        </div>
+        <div class="how-steps">
+            <div class="how-step">
+                <div class="how-step-num">1</div>
+                <div class="how-step-icon" style="background:rgba(124,58,237,0.15);color:#a78bfa;">
+                    <i class="fa-solid fa-user-plus"></i>
+                </div>
+                <h3>Create Your Profile</h3>
+                <p>Sign up, add your travel interests, and get verified to start hosting your own adventures.</p>
+            </div>
+            <div class="how-step">
+                <div class="how-step-num">2</div>
+                <div class="how-step-icon" style="background:rgba(6,182,212,0.12);color:#38bdf8;">
+                    <i class="fa-solid fa-magnifying-glass-location"></i>
+                </div>
+                <h3>Find or Host Trips</h3>
+                <p>Browse curated trips by destination, category, and budget — or host your own and invite fellow travelers.</p>
+            </div>
+            <div class="how-step">
+                <div class="how-step-num">3</div>
+                <div class="how-step-icon" style="background:rgba(16,185,129,0.12);color:#34d399;">
+                    <i class="fa-solid fa-plane-departure"></i>
+                </div>
+                <h3>Travel Together</h3>
+                <p>Join, pay securely, connect with your group, and create unforgettable memories worldwide.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why TripSync Features -->
+    <section class="features-section">
+        <div class="text-center" style="margin-bottom:2.5rem;">
+            <h2 style="font-size:1.75rem;font-weight:800;letter-spacing:-0.03em;">Why TripSync?</h2>
+            <p class="text-muted" style="margin-top:0.5rem;">Everything you need for an epic solo adventure</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon" style="background:rgba(124,58,237,0.15);color:#a78bfa;">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <h3>Find Travel Companions</h3>
+                <p>Browse trips by destination, date, or budget and connect with like-minded solo travelers.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:rgba(6,182,212,0.12);color:#38bdf8;">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <h3>Split Costs Easily</h3>
+                <p>Use our integrated payment system to fairly split trip costs with your fellow adventurers.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:rgba(16,185,129,0.12);color:#34d399;">
+                    <i class="fa-solid fa-shield-check"></i>
+                </div>
+                <h3>Verified Hosts Only</h3>
+                <p>Every trip host is verified by our team. Travel with confidence knowing who you're joining.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:rgba(245,158,11,0.12);color:#fbbf24;">
+                    <i class="fa-solid fa-heart"></i>
+                </div>
+                <h3>Wishlist Trips</h3>
+                <p>Save interesting trips to your wishlist and decide later. Never lose track of your dream adventures.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trending Trips Preview -->
+    <section style="padding: 0 2.5rem 4rem; max-width:1400px; margin:0 auto; width:100%;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+            <div>
+                <h2 style="font-size:1.4rem;font-weight:800;">🔥 Trending Trips</h2>
+                <p class="text-muted" style="font-size:0.85rem;margin-top:0.25rem;">Popular adventures near you</p>
+            </div>
+            <a href="find-trips.html" class="btn btn-ghost btn-sm" style="width:auto;display:inline-flex;">
+                View all <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+        <div class="trips-grid" id="preview-grid">
+            <div class="skeleton skeleton-card"></div>
+            <div class="skeleton skeleton-card"></div>
+            <div class="skeleton skeleton-card"></div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="home.html" class="logo">
+                    <div class="logo-icon-nav" style="width:28px;height:28px;font-size:0.8rem;">✈️</div>
+                    <span class="logo-text">TripSync</span>
+                </a>
+                <p>The world's best platform for solo travelers to connect, collaborate, and explore together safely.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Explore</h4>
+                <a href="find-trips.html">Browse Trips</a>
+                <a href="create-trip.html">Host a Trip</a>
+                <a href="my-trips.html">My Adventures</a>
+                <a href="wishlist.html">Wishlist</a>
+            </div>
+            <div class="footer-col">
+                <h4>Account</h4>
+                <a href="profile.html">My Profile</a>
+                <a href="profile.html">Get Verified</a>
+                <a href="login.html">Login</a>
+                <a href="signup.html">Sign Up</a>
+            </div>
+            <div class="footer-col">
+                <h4>Safety</h4>
+                <a href="#">Verified Hosts</a>
+                <a href="#">Community Guidelines</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 TripSync. Made with ❤️ for solo travelers everywhere.</p>
+            <div class="footer-socials">
+                <a href="#" class="footer-social-btn" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" class="footer-social-btn" title="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+                <a href="#" class="footer-social-btn" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top -->
+    <button id="back-to-top" title="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
+
+    <script src="api.js"></script>
+    <script>
+        checkAuth();
+
+        function animateCount(el, target) {
+            let current = 0;
+            const step = Math.ceil(target / 40);
+            const timer = setInterval(() => {
+                current = Math.min(current + step, target);
+                el.textContent = current + (target >= 100 ? '+' : '');
+                if (current >= target) clearInterval(timer);
+            }, 40);
+        }
+
+        async function loadStats() {
+            try {
+                const data = await apiCall('/stats');
+                animateCount(document.getElementById('stat-trips'), data.trips || 0);
+                animateCount(document.getElementById('stat-travelers'), data.users || 0);
+                animateCount(document.getElementById('stat-dest'), data.destinations || 0);
+            } catch {
+                document.getElementById('stat-trips').textContent = '0';
+                document.getElementById('stat-travelers').textContent = '0';
+                document.getElementById('stat-dest').textContent = '0';
+            }
+        }
+
+        // No openModal on home — details link goes to find-trips
+        function openModal() { window.location.href = 'find-trips.html'; }
+        function joinTrip() { window.location.href = 'find-trips.html'; }
+
+        async function loadPreviewTrips() {
+            const grid = document.getElementById('preview-grid');
+            try {
+                const wishlistSet = await getWishlist();
+                const data = await apiCall('/trips?user_id=' + getUserId());
+                const trips = (data.trips || []).slice(0, 3);
+                if (!trips.length) {
+                    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><span class="empty-icon">🗺️</span><p>No trips yet. Be the first to host one!</p><a href="create-trip.html" class="btn" style="width:auto;display:inline-flex;">Host a Trip</a></div>';
+                    return;
+                }
+                grid.innerHTML = trips.map(trip => buildTripCard(trip, wishlistSet)).join('');
+            } catch {
+                grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><span class="empty-icon">⚠️</span><p>Could not load trips.</p></div>';
+            }
+        }
+
+        loadStats();
+        loadPreviewTrips();
+    </script>
+</body>
+</html>

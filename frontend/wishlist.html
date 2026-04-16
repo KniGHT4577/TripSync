@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Wishlist – TripSync</title>
+    <meta name="description" content="View and manage your saved trips on TripSync.">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Mobile Nav -->
+    <div id="mobile-nav-overlay"></div>
+    <div id="mobile-nav-drawer">
+        <div class="mobile-nav-header">
+            <a href="home.html" class="logo" onclick="closeMobileNav()">
+                <div class="logo-icon-nav">✈️</div>
+                <span class="logo-text">TripSync</span>
+            </a>
+            <button class="mobile-nav-close" onclick="closeMobileNav()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="mobile-nav-links">
+            <a href="home.html" onclick="closeMobileNav()"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="find-trips.html" onclick="closeMobileNav()"><i class="fa-solid fa-compass"></i> Explore</a>
+            <a href="my-trips.html" onclick="closeMobileNav()"><i class="fa-solid fa-suitcase"></i> My Trips</a>
+            <a href="wishlist.html" class="active" onclick="closeMobileNav()"><i class="fa-solid fa-heart"></i> Wishlist</a>
+            <a href="profile.html" onclick="closeMobileNav()"><i class="fa-solid fa-user"></i> Profile</a>
+            <a href="create-trip.html" class="btn-cta-mobile" onclick="closeMobileNav()"><i class="fa-solid fa-plus"></i> Host a Trip</a>
+            <a href="#" onclick="logout()" style="color:#f87171;margin-top:0.5rem;"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
+        </div>
+    </div>
+
+    <nav class="navbar" id="navbar">
+        <a href="home.html" class="logo">
+            <div class="logo-icon-nav">✈️</div>
+            <span class="logo-text">TripSync</span>
+        </a>
+        <div class="nav-links">
+            <a href="home.html">Home</a>
+            <a href="find-trips.html">Explore</a>
+            <a href="my-trips.html">My Trips</a>
+            <a href="wishlist.html" class="active"><i class="fa-solid fa-heart" style="color:#f43f5e;"></i></a>
+            <a href="create-trip.html" class="btn-primary"><i class="fa-solid fa-plus"></i> Host Trip</a>
+            <a href="profile.html" class="nav-profile-btn" title="My Profile">U</a>
+            <button class="btn-ghost" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+        <button class="hamburger-btn" onclick="toggleMobileNav()"><i class="fa-solid fa-bars"></i></button>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="page-header">
+            <h1>My Wishlist ❤️<small>Trips you've saved for later</small></h1>
+            <a href="find-trips.html" class="btn btn-ghost btn-sm" style="width:auto;display:inline-flex;">
+                <i class="fa-solid fa-compass"></i> Explore More
+            </a>
+        </div>
+
+        <div id="error" class="error-msg" style="margin-bottom:1rem;"></div>
+        <div class="trips-grid" id="wishlist-grid">
+            <div class="skeleton skeleton-card"></div>
+            <div class="skeleton skeleton-card"></div>
+            <div class="skeleton skeleton-card"></div>
+        </div>
+    </div>
+
+    <!-- Back to Top -->
+    <button id="back-to-top" title="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
+
+    <script src="api.js"></script>
+    <script>
+        const userId = checkAuth();
+
+        // openModal on wishlist redirects to find-trips
+        function openModal() { window.location.href = 'find-trips.html'; }
+        function joinTrip() { window.location.href = 'find-trips.html'; }
+
+        async function loadWishlist() {
+            const grid = document.getElementById('wishlist-grid');
+            try {
+                const [wData, joinedStatusData] = await Promise.all([
+                    apiCall(`/wishlist/${userId}`),
+                    apiCall(`/trips/my-trips?user_id=${userId}`)
+                ]);
+
+                const wishlistIds = wData.wishlist || [];
+                if (!wishlistIds.length) {
+                    grid.innerHTML = `
+                        <div class="empty-state">
+                            <span class="empty-icon">💔</span>
+                            <p>Your wishlist is empty.</p>
+                            <p style="font-size:0.85rem;max-width:280px;margin:0 auto 1.25rem;">
+                                Tap the <i class="fa-regular fa-heart" style="color:#f43f5e;"></i> heart icon on any trip to save it here.
+                            </p>
+                            <a href="find-trips.html" class="btn btn-sm" style="width:auto;display:inline-flex;margin:0 auto;">
+                                <i class="fa-solid fa-compass"></i> Browse Trips
+                            </a>
+                        </div>`;
+                    return;
+                }
+
+                const joinedIds = new Set([
+                    ...(joinedStatusData.hosted || []).map(t => t._id),
+                    ...(joinedStatusData.joined || []).map(t => t._id)
+                ]);
+
+                const wishlistSet = new Set(wishlistIds);
+                const cards = await Promise.all(wishlistIds.map(async (tripId) => {
+                    try {
+                        const d = await apiCall(`/trip/${tripId}`);
+                        const trip = d.trip;
+                        trip.is_joined = joinedIds.has(trip._id);
+                        return buildTripCard(trip, wishlistSet);
+                    } catch {
+                        return '';
+                    }
+                }));
+
+                grid.innerHTML = cards.join('');
+            } catch (err) {
+                grid.innerHTML = '<div class="empty-state"><span class="empty-icon">⚠️</span><p>Failed to load wishlist.</p></div>';
+                document.getElementById('error').textContent = err.message;
+            }
+        }
+
+        // Override wishlist toggle on wish page to also animate card out when un-saved
+        async function handleWishlistToggle(tripId, btn) {
+            const wasWishlisted = btn.classList.contains('wishlisted');
+            await toggleWishlist(tripId, btn);
+            if (wasWishlisted) {
+                // Remove card from wishlist view
+                const card = document.getElementById(`card-${tripId}`);
+                if (card) {
+                    card.style.transition = 'all 0.3s ease';
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        card.remove();
+                        // Check if empty
+                        const grid = document.getElementById('wishlist-grid');
+                        if (!grid.querySelector('.trip-card')) {
+                            grid.innerHTML = `<div class="empty-state"><span class="empty-icon">💔</span><p>Your wishlist is empty.</p><a href="find-trips.html" class="btn btn-sm" style="width:auto;display:inline-flex;margin:0 auto;">Browse Trips</a></div>`;
+                        }
+                    }, 300);
+                }
+            }
+        }
+
+        if (userId) loadWishlist();
+    </script>
+</body>
+</html>
