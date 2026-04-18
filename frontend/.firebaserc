@@ -1,5 +1,7 @@
 {
-  "projects": {},
+  "projects": {
+    "default": "tripsync-e202f"
+  },
   "targets": {},
   "etags": {}
 }
