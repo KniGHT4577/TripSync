@@ -1,4 +1,4 @@
-const BASE_URL = 'https://tripsync-api.onrender.com';
+const BASE_URL = 'https://tripsync-api-3yth.onrender.com';
 
 // ─── Auth Helpers ─────────────────────────────────────────────
 function getUserId() { return localStorage.getItem('user_id'); }
